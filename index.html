@@ -89,33 +89,58 @@ function showReceipt(data){
 
   document.body.innerHTML = `
     <style>
+      @page{
+        size:58mm auto;
+        margin:0;
+      }
+
       body{
         background:white;
-        font-family:"Courier New", monospace;
+        font-family:"Consolas","Lucida Console","Courier New",monospace;
         font-size:12px;
+        line-height:1.15;
         color:#000;
+        margin:0;
+        font-weight:400;
       }
+
       .receipt{
-        width:280px;
+        width:58mm;
         margin:0 auto;
-        padding:12px;
+        padding:2mm;
+        box-sizing:border-box;
       }
-      .center{text-align:center}
+
+      .center{
+        text-align:center;
+      }
+
       .line{
         display:flex;
         justify-content:space-between;
-        gap:10px;
+        gap:4px;
       }
+
       .line span{
-        max-width:190px;
+        max-width:37mm;
       }
+
       hr{
         border:0;
         border-top:1px dashed #000;
+        margin:4px 0;
       }
+
       @media print{
-        body{margin:0}
-        .receipt{width:58mm}
+        body{
+          margin:0;
+        }
+
+        .receipt{
+          width:58mm;
+          margin:0;
+          padding:2mm;
+        }
       }
     </style>
 
