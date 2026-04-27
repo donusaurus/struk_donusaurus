@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Struk Donusaurus</title>
+</head>
+
+<body>
+<div style="font-family:monospace;padding:20px">Memuat struk...</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwCcACselUrqfBcaxrif7rVGjyJVjUGNc2N2XqSgyZMtqh8FM6Ta8iUVsz5BEDpXPzuow/exec";
+
+window.addEventListener("load", loadReceipt);
+
+function getParam(name){
+  return new URL(window.location.href).searchParams.get(name);
+}
+
+function toNumber(n){
+  return Number(String(n || "0").replace(/[^\d]/g, ""));
+}
+
+function rp(n){
+  return toNumber(n).toLocaleString("id-ID");
+}
+
+function orderNo(n){
+  return String(n || "").replace(/[^\d]/g, "").padStart(3, "0");
+}
+
+function safeSplit(v){
+  return String(v || "").split(" | ");
+}
+
+function getQtyFromItem(item){
+  let match = String(item || "").match(/^(\d+)x/i);
+  return match ? Number(match[1]) : 1;
+}
+
+async function loadReceipt(){
+  let id = getParam("id");
+
+  if(!id){
+    document.body.innerHTML = "ID struk tidak ditemukan";
+    return;
+  }
+
+  try{
+    let res = await fetch(API_URL + "?id=" + encodeURIComponent(id));
+    let data = await res.json();
+
+    if(data.error){
+      document.body.innerHTML = data.message || "Struk tidak ditemukan";
+      return;
+    }
+
+    showReceipt(data);
+
+  }catch(err){
+    document.body.innerHTML = "Gagal memuat struk: " + err.message;
+  }
+}
+
+function showReceipt(data){
+  let items = safeSplit(data.item);
+  let rasa = safeSplit(data.rasa);
+  let harga = safeSplit(data.harga);
+  let rows = "";
+
+  items.forEach((it, i) => {
+    let lineTotal = toNumber(harga[i] || data.total);
+    let qty = getQtyFromItem(it);
+    let hargaSatuan = qty > 0 ? lineTotal / qty : lineTotal;
+
+    rows += `
+      <div class="line">
+        <span>${it} @Rp${rp(hargaSatuan)}</span>
+        <b>Rp${rp(lineTotal)}</b>
+      </div>
+    `;
+
+    String(rasa[i] || "").split(", ").filter(Boolean).forEach(r => {
+      rows += `<div>- ${r}</div>`;
+    });
+
+    rows += "<br>";
+  });
+
+  document.body.innerHTML = `
+    <style>
+      body{
+        background:white;
+        font-family:"Courier New", monospace;
+        font-size:12px;
+        color:#000;
+      }
+      .receipt{
+        width:280px;
+        margin:0 auto;
+        padding:12px;
+      }
+      .center{text-align:center}
+      .line{
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+      }
+      .line span{
+        max-width:190px;
+      }
+      hr{
+        border:0;
+        border-top:1px dashed #000;
+      }
+      @media print{
+        body{margin:0}
+        .receipt{width:58mm}
+      }
+    </style>
+
+    <div class="receipt">
+      <div class="center">
+        Donusaurus<br>
+        Cabang Sungai Jawi<br>
+        Jl. H Rais A Rahman No.171B
+      </div>
+
+      <hr>
+
+      Order ID : #${orderNo(data.orderID)} / ${data.kodeUnik}<br>
+      Customer : ${data.nama || "-"} (${data.sumber || "-"})<br>
+      Tanggal  : ${data.tanggal}, ${data.jam}
+
+      <hr>
+
+      ${rows}
+
+      <hr>
+
+      <div class="line">
+        <span>Total</span>
+        <b>Rp${rp(data.total)}</b>
+      </div>
+      Metode : ${data.metode}
+
+      <hr>
+
+      <div class="center">
+        Thank you for your purchase!<br>
+        Don't miss your next treat<br>
+        Follow @donusaurus for updates
+      </div>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
