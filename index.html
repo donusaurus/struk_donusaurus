@@ -75,9 +75,10 @@ function showReceipt(data){
 
     rows += `
       <div class="line">
-        <span>${it} @Rp${rp(hargaSatuan)}</span>
+        <span>${it}</span>
         <b>Rp${rp(lineTotal)}</b>
       </div>
+      <div>@Rp${rp(hargaSatuan)}</div>
     `;
 
     String(rasa[i] || "").split(", ").filter(Boolean).forEach(r => {
@@ -100,7 +101,7 @@ function showReceipt(data){
         background:white;
         font-family:"Roboto Mono","Droid Sans Mono","Courier New",monospace;
         font-size:11px;
-        line-height:1.25;
+        line-height:1.22;
         color:#000;
         margin:0;
         font-weight:600;
@@ -109,7 +110,7 @@ function showReceipt(data){
       .receipt{
         width:58mm;
         margin:0 auto;
-        padding:2mm 1.5mm 8mm;
+        padding:3mm 1.5mm 10mm;
         box-sizing:border-box;
       }
 
@@ -117,28 +118,41 @@ function showReceipt(data){
         text-align:center;
       }
 
+      .header{
+        margin-bottom:6px;
+      }
+
+      .section{
+        margin:7px 0;
+      }
+
       .line{
         display:flex;
         justify-content:space-between;
-        gap:3px;
+        gap:6px;
       }
 
       .line span{
-        max-width:35mm;
+        max-width:34mm;
       }
 
       .line b{
         font-weight:700;
+        white-space:nowrap;
       }
 
       .item-gap{
-        height:6px;
+        height:8px;
       }
 
       hr{
         border:0;
         border-top:1px dashed #000;
-        margin:6px 0;
+        margin:8px 0;
+      }
+
+      .closing{
+        margin-top:8px;
       }
 
       @media print{
@@ -149,13 +163,13 @@ function showReceipt(data){
         .receipt{
           width:58mm;
           margin:0;
-          padding:2mm 1.5mm 8mm;
+          padding:3mm 1.5mm 10mm;
         }
       }
     </style>
 
     <div class="receipt">
-      <div class="center">
+      <div class="center header">
         Donusaurus<br>
         Cabang Sungai Jawi<br>
         Jl. H Rais A Rahman No.171B
@@ -163,25 +177,31 @@ function showReceipt(data){
 
       <hr>
 
-      Order ID : #${orderNo(data.orderID)} / ${data.kodeUnik}<br>
-      Customer : ${data.nama || "-"} (${data.sumber || "-"})<br>
-      Tanggal  : ${data.tanggal}, ${data.jam}
-
-      <hr>
-
-      ${rows}
-
-      <hr>
-
-      <div class="line">
-        <span>Total</span>
-        <b>Rp${rp(data.total)}</b>
+      <div class="section">
+        Order ID : #${orderNo(data.orderID)} / ${data.kodeUnik}<br>
+        Customer : ${data.nama || "-"} (${data.sumber || "-"})<br>
+        Tanggal  : ${data.tanggal}, ${data.jam}
       </div>
-      Metode : ${data.metode}
 
       <hr>
 
-      <div class="center">
+      <div class="section">
+        ${rows}
+      </div>
+
+      <hr>
+
+      <div class="section">
+        <div class="line">
+          <span>Total</span>
+          <b>Rp${rp(data.total)}</b>
+        </div>
+        Metode : ${data.metode}
+      </div>
+
+      <hr>
+
+      <div class="center closing">
         Thank you for your purchase!<br>
         Don't miss your next treat<br>
         Follow @donusaurus for updates
