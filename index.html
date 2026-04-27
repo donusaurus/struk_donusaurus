@@ -84,7 +84,7 @@ function showReceipt(data){
       rows += `<div>- ${r}</div>`;
     });
 
-    rows += "<br>";
+    rows += `<div class="item-gap"></div>`;
   });
 
   document.body.innerHTML = `
@@ -100,7 +100,7 @@ function showReceipt(data){
         background:white;
         font-family:"Roboto Mono","Droid Sans Mono","Courier New",monospace;
         font-size:11px;
-        line-height:1.12;
+        line-height:1.25;
         color:#000;
         margin:0;
         font-weight:600;
@@ -109,7 +109,7 @@ function showReceipt(data){
       .receipt{
         width:58mm;
         margin:0 auto;
-        padding:1.5mm;
+        padding:2mm 1.5mm 8mm;
         box-sizing:border-box;
       }
 
@@ -131,10 +131,14 @@ function showReceipt(data){
         font-weight:700;
       }
 
+      .item-gap{
+        height:6px;
+      }
+
       hr{
         border:0;
         border-top:1px dashed #000;
-        margin:3px 0;
+        margin:6px 0;
       }
 
       @media print{
@@ -145,7 +149,7 @@ function showReceipt(data){
         .receipt{
           width:58mm;
           margin:0;
-          padding:1.5mm;
+          padding:2mm 1.5mm 8mm;
         }
       }
     </style>
