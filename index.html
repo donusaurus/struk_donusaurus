@@ -97,8 +97,8 @@ function showReceipt(data){
       body{
         background:white;
         font-family:"Consolas","Lucida Console","Courier New",monospace;
-        font-size:12px;
-        line-height:1.15;
+        font-size:11px;
+        line-height:1.1;
         color:#000;
         margin:0;
         font-weight:400;
@@ -107,7 +107,7 @@ function showReceipt(data){
       .receipt{
         width:58mm;
         margin:0 auto;
-        padding:2mm;
+        padding:1.5mm;
         box-sizing:border-box;
       }
 
@@ -118,17 +118,17 @@ function showReceipt(data){
       .line{
         display:flex;
         justify-content:space-between;
-        gap:4px;
+        gap:3px;
       }
 
       .line span{
-        max-width:37mm;
+        max-width:35mm;
       }
 
       hr{
         border:0;
         border-top:1px dashed #000;
-        margin:4px 0;
+        margin:3px 0;
       }
 
       @media print{
@@ -139,7 +139,7 @@ function showReceipt(data){
         .receipt{
           width:58mm;
           margin:0;
-          padding:2mm;
+          padding:1.5mm;
         }
       }
     </style>
