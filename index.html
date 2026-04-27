@@ -89,6 +89,8 @@ function showReceipt(data){
 
   document.body.innerHTML = `
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;600;700&display=swap');
+
       @page{
         size:58mm auto;
         margin:0;
@@ -96,12 +98,12 @@ function showReceipt(data){
 
       body{
         background:white;
-        font-family:"Consolas","Lucida Console","Courier New",monospace;
+        font-family:"Roboto Mono","Droid Sans Mono","Courier New",monospace;
         font-size:11px;
-        line-height:1.1;
+        line-height:1.12;
         color:#000;
         margin:0;
-        font-weight:400;
+        font-weight:600;
       }
 
       .receipt{
@@ -123,6 +125,10 @@ function showReceipt(data){
 
       .line span{
         max-width:35mm;
+      }
+
+      .line b{
+        font-weight:700;
       }
 
       hr{
