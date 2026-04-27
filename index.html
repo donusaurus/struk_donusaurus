@@ -38,6 +38,12 @@ function getQtyFromItem(item){
   return match ? Number(match[1]) : 1;
 }
 
+function shortItemName(item){
+  return String(item || "")
+    .replace("Box Donat (6 pcs)", "Box (6 pcs)")
+    .replace("Pcs Donat", "Pcs Donat");
+}
+
 async function loadReceipt(){
   let id = getParam("id");
 
@@ -74,15 +80,14 @@ function showReceipt(data){
     let hargaSatuan = qty > 0 ? lineTotal / qty : lineTotal;
 
     rows += `
-      <div class="line">
-        <span>${it}</span>
+      <div class="item-line">
+        <span>${shortItemName(it)} @Rp${rp(hargaSatuan)}</span>
         <b>Rp${rp(lineTotal)}</b>
       </div>
-      <div>@Rp${rp(hargaSatuan)}</div>
     `;
 
     String(rasa[i] || "").split(", ").filter(Boolean).forEach(r => {
-      rows += `<div>- ${r}</div>`;
+      rows += `<div class="flavor">- ${r}</div>`;
     });
 
     rows += `<div class="item-gap"></div>`;
@@ -126,23 +131,41 @@ function showReceipt(data){
         margin:7px 0;
       }
 
-      .line{
-        display:flex;
-        justify-content:space-between;
-        gap:6px;
+      .meta-row{
+        display:grid;
+        grid-template-columns:18mm 3mm 1fr;
       }
 
-      .line span{
-        max-width:34mm;
+      .item-line{
+        display:grid;
+        grid-template-columns:1fr auto;
+        gap:4px;
+        align-items:start;
+        font-size:10px;
       }
 
-      .line b{
+      .item-line b{
         font-weight:700;
         white-space:nowrap;
       }
 
+      .flavor{
+        padding-left:0;
+      }
+
       .item-gap{
         height:8px;
+      }
+
+      .total-line{
+        display:grid;
+        grid-template-columns:1fr auto;
+        gap:4px;
+      }
+
+      .total-line b{
+        font-weight:700;
+        white-space:nowrap;
       }
 
       hr{
@@ -178,9 +201,9 @@ function showReceipt(data){
       <hr>
 
       <div class="section">
-        Order ID : #${orderNo(data.orderID)} / ${data.kodeUnik}<br>
-        Customer : ${data.nama || "-"} (${data.sumber || "-"})<br>
-        Tanggal  : ${data.tanggal}, ${data.jam}
+        <div class="meta-row"><span>Order ID</span><span>:</span><span>#${orderNo(data.orderID)} / ${data.kodeUnik}</span></div>
+        <div class="meta-row"><span>Customer</span><span>:</span><span>${data.nama || "-"} (${data.sumber || "-"})</span></div>
+        <div class="meta-row"><span>Tanggal</span><span>:</span><span>${data.tanggal}, ${data.jam}</span></div>
       </div>
 
       <hr>
@@ -192,11 +215,11 @@ function showReceipt(data){
       <hr>
 
       <div class="section">
-        <div class="line">
+        <div class="total-line">
           <span>Total</span>
           <b>Rp${rp(data.total)}</b>
         </div>
-        Metode : ${data.metode}
+        <div class="meta-row"><span>Metode</span><span>:</span><span>${data.metode}</span></div>
       </div>
 
       <hr>
