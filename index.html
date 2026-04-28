@@ -18,7 +18,7 @@ function getParam(name){
 }
 
 function toNumber(n){
-  return Number(String(n || "0").replace(/[^\d]/g, ""));
+  return Number(String(n || "0").replace(/[^\d]/g, "")) || 0;
 }
 
 function rp(n){
@@ -42,6 +42,18 @@ function shortItemName(item){
   return String(item || "")
     .replace("Box Donat (6 pcs)", "Box (6 pcs)")
     .replace("Pcs Donat", "Pcs Donat");
+}
+
+function parseAddOnLine(text){
+  const line = String(text || "").trim();
+  const match = line.match(/^(.*?)\s*=\s*Rp([\d.]+)$/i);
+  if(!match){
+    return { label: line, total: 0 };
+  }
+  return {
+    label: match[1].trim(),
+    total: toNumber(match[2])
+  };
 }
 
 async function loadReceipt(){
@@ -73,6 +85,8 @@ function showReceipt(data){
   let rasa = safeSplit(data.rasa);
   let harga = safeSplit(data.harga);
   let rows = "";
+  let addOnRows = "";
+  let addOns = safeSplit(data.addOn).filter(x => x && x !== "-");
 
   items.forEach((it, i) => {
     let lineTotal = toNumber(harga[i] || data.total);
@@ -92,6 +106,20 @@ function showReceipt(data){
 
     rows += `<div class="item-gap"></div>`;
   });
+
+  if(addOns.length){
+    addOnRows += `<hr><div class="section"><div class="section-title">Add On</div>`;
+    addOns.forEach(line => {
+      const item = parseAddOnLine(line);
+      addOnRows += `
+        <div class="item-line">
+          <span>${item.label}</span>
+          <b>${item.total ? "Rp" + rp(item.total) : ""}</b>
+        </div>
+      `;
+    });
+    addOnRows += `</div>`;
+  }
 
   document.body.innerHTML = `
     <style>
@@ -119,17 +147,10 @@ function showReceipt(data){
         box-sizing:border-box;
       }
 
-      .center{
-        text-align:center;
-      }
-
-      .header{
-        margin-bottom:6px;
-      }
-
-      .section{
-        margin:7px 0;
-      }
+      .center{text-align:center}
+      .header{margin-bottom:6px}
+      .section{margin:7px 0}
+      .section-title{font-weight:700;margin-bottom:4px}
 
       .meta-row{
         display:grid;
@@ -149,13 +170,8 @@ function showReceipt(data){
         white-space:nowrap;
       }
 
-      .flavor{
-        padding-left:0;
-      }
-
-      .item-gap{
-        height:8px;
-      }
+      .flavor{padding-left:0}
+      .item-gap{height:8px}
 
       .total-line{
         display:grid;
@@ -174,15 +190,10 @@ function showReceipt(data){
         margin:8px 0;
       }
 
-      .closing{
-        margin-top:8px;
-      }
+      .closing{margin-top:8px}
 
       @media print{
-        body{
-          margin:0;
-        }
-
+        body{margin:0}
         .receipt{
           width:58mm;
           margin:0;
@@ -194,7 +205,7 @@ function showReceipt(data){
     <div class="receipt">
       <div class="center header">
         Donusaurus<br>
-        Cabang Sungai Jawi<br>
+        Sungai Jawi<br>
         Jl. H Rais A Rahman No.171B
       </div>
 
@@ -211,6 +222,8 @@ function showReceipt(data){
       <div class="section">
         ${rows}
       </div>
+
+      ${addOnRows}
 
       <hr>
 
