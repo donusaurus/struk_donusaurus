@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Struk Donusaurus</title>
@@ -29,6 +29,15 @@ function orderNo(n){
   return String(n || "").replace(/[^\d]/g, "").padStart(3, "0");
 }
 
+function escapeHtml(value){
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function safeSplit(v){
   return String(v || "").split(" | ");
 }
@@ -54,6 +63,15 @@ function parseAddOnLine(text){
     label: match[1].trim(),
     total: toNumber(match[2])
   };
+}
+
+function renderDetailLines(text){
+  return String(text || "")
+    .split(", ")
+    .map(x => x.trim())
+    .filter(x => x && x !== "-")
+    .map(x => `<div class="flavor">- ${escapeHtml(x)}</div>`)
+    .join("");
 }
 
 async function loadReceipt(){
@@ -87,23 +105,23 @@ function showReceipt(data){
   let rows = "";
   let addOnRows = "";
   let addOns = safeSplit(data.addOn).filter(x => x && x !== "-");
+  let isCanceled = String(data.status || "").toLowerCase() === "dibatalkan";
 
   items.forEach((it, i) => {
+    if(!it || it === "-") return;
+
     let lineTotal = toNumber(harga[i] || data.total);
     let qty = getQtyFromItem(it);
     let hargaSatuan = qty > 0 ? lineTotal / qty : lineTotal;
 
     rows += `
       <div class="item-line">
-        <span>${shortItemName(it)} @Rp${rp(hargaSatuan)}</span>
+        <span>${escapeHtml(shortItemName(it))} @Rp${rp(hargaSatuan)}</span>
         <b>Rp${rp(lineTotal)}</b>
       </div>
     `;
 
-    String(rasa[i] || "").split(", ").filter(Boolean).forEach(r => {
-      rows += `<div class="flavor">- ${r}</div>`;
-    });
-
+    rows += renderDetailLines(rasa[i]);
     rows += `<div class="item-gap"></div>`;
   });
 
@@ -113,7 +131,7 @@ function showReceipt(data){
       const item = parseAddOnLine(line);
       addOnRows += `
         <div class="item-line">
-          <span>${item.label}</span>
+          <span>${escapeHtml(item.label)}</span>
           <b>${item.total ? "Rp" + rp(item.total) : ""}</b>
         </div>
       `;
@@ -151,6 +169,14 @@ function showReceipt(data){
       .header{margin-bottom:6px}
       .section{margin:7px 0}
       .section-title{font-weight:700;margin-bottom:4px}
+
+      .void-box{
+        border:1px dashed #000;
+        padding:5px 3px;
+        margin:7px 0;
+        text-align:center;
+        font-weight:700;
+      }
 
       .meta-row{
         display:grid;
@@ -209,18 +235,30 @@ function showReceipt(data){
         Jl. H Rais A Rahman No.171B
       </div>
 
+      ${isCanceled ? `
+        <div class="void-box">
+          TRANSAKSI DIBATALKAN<br>
+          ${escapeHtml(data.dibatalkanPada || "-")}
+        </div>
+      ` : ""}
+
       <hr>
 
       <div class="section">
-        <div class="meta-row"><span>Order ID</span><span>:</span><span>#${orderNo(data.orderID)} / ${data.kodeUnik}</span></div>
-        <div class="meta-row"><span>Customer</span><span>:</span><span>${data.nama || "-"} (${data.sumber || "-"})</span></div>
-        <div class="meta-row"><span>Tanggal</span><span>:</span><span>${data.tanggal}, ${data.jam}</span></div>
+        <div class="meta-row"><span>Order ID</span><span>:</span><span>#${orderNo(data.orderID)} / ${escapeHtml(data.kodeUnik)}</span></div>
+        <div class="meta-row"><span>Customer</span><span>:</span><span>${escapeHtml(data.nama || "-")} (${escapeHtml(data.sumber || "-")})</span></div>
+        <div class="meta-row"><span>Tanggal</span><span>:</span><span>${escapeHtml(data.tanggal)}, ${escapeHtml(data.jam)}</span></div>
+        <div class="meta-row"><span>Status</span><span>:</span><span>${escapeHtml(data.status || "Aktif")}</span></div>
+        ${isCanceled ? `
+          <div class="meta-row"><span>Batal</span><span>:</span><span>${escapeHtml(data.dibatalkanPada || "-")}</span></div>
+          <div class="meta-row"><span>Alasan</span><span>:</span><span>${escapeHtml(data.alasanBatal || "-")}</span></div>
+        ` : ""}
       </div>
 
       <hr>
 
       <div class="section">
-        ${rows}
+        ${rows || "-"}
       </div>
 
       ${addOnRows}
@@ -232,7 +270,7 @@ function showReceipt(data){
           <span>Total</span>
           <b>Rp${rp(data.total)}</b>
         </div>
-        <div class="meta-row"><span>Metode</span><span>:</span><span>${data.metode}</span></div>
+        <div class="meta-row"><span>Metode</span><span>:</span><span>${escapeHtml(data.metode)}</span></div>
       </div>
 
       <hr>
