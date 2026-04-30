@@ -248,11 +248,7 @@ function showReceipt(data){
         <div class="meta-row"><span>Order ID</span><span>:</span><span>#${orderNo(data.orderID)} / ${escapeHtml(data.kodeUnik)}</span></div>
         <div class="meta-row"><span>Customer</span><span>:</span><span>${escapeHtml(data.nama || "-")} (${escapeHtml(data.sumber || "-")})</span></div>
         <div class="meta-row"><span>Tanggal</span><span>:</span><span>${escapeHtml(data.tanggal)}, ${escapeHtml(data.jam)}</span></div>
-        <div class="meta-row"><span>Status</span><span>:</span><span>${escapeHtml(data.status || "Aktif")}</span></div>
-        ${isCanceled ? `
-          <div class="meta-row"><span>Batal</span><span>:</span><span>${escapeHtml(data.dibatalkanPada || "-")}</span></div>
-          <div class="meta-row"><span>Alasan</span><span>:</span><span>${escapeHtml(data.alasanBatal || "-")}</span></div>
-        ` : ""}
+        
       </div>
 
       <hr>
