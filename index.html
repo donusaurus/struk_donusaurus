@@ -188,7 +188,7 @@ function showReceipt(data){
         grid-template-columns:1fr auto;
         gap:4px;
         align-items:start;
-        font-size:10px;
+        font-size:9px;
       }
 
       .item-line b{
@@ -271,6 +271,10 @@ function showReceipt(data){
           <b>Rp${rp(data.total)}</b>
         </div>
         <div class="meta-row"><span>Metode</span><span>:</span><span>${escapeHtml(data.metode)}</span></div>
+        ${String(data.metode || "") === "Cash" ? `
+          <div class="meta-row"><span>Bayar</span><span>:</span><span>Rp${rp(data.bayar)}</span></div>
+          <div class="meta-row"><span>Kembali</span><span>:</span><span>Rp${rp(data.kembalian)}</span></div>
+        ` : ""}
       </div>
 
       <hr>
